@@ -3,6 +3,7 @@ package cn.lw.tv.douban.fm;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -79,6 +80,25 @@ public class FMController {
         response.setContentType("image/jpeg");
         ServletOutputStream os = response.getOutputStream();
         IOUtils.copy(inputStream, os);
+        os.flush();
+        os.close();
+    }
+
+    @RequestMapping("/fm/dowload")
+    public void download(@CookieValue(name="un") String un, HttpServletResponse response) throws IOException {
+        List<Song> songs = fmService.getCache(un);
+        StringBuilder builder = new StringBuilder();
+        for(Song song : songs) {
+            builder.append(song.getTitle()).append("\n").append(song.getUrl()).append("\n");
+            for(Singer singer : song.getSingers()) {
+                builder.append(singer.getName()).append("|");
+            }
+            builder.append("\n\n");
+        }
+        response.setHeader("Content-Disposition", "attachment;filename=Songs.txt");
+//        response.setHeader("Content-Type", "text/plain");
+        ServletOutputStream os = response.getOutputStream();
+        IOUtils.write(builder.toString().getBytes(), os);
         os.flush();
         os.close();
     }

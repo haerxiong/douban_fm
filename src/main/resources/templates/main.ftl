@@ -35,7 +35,8 @@
 
 <div class="row">
     <div class="tools" style="text-align: right;padding-right: 50px">
-        <button type="button" class="btn btn-link" onclick="rs()">切换用户</button>
+        <button type="button" class="btn btn-link" onclick="goUrl('${ctx}/clear')">切换用户</button>
+        <button type="button" class="btn btn-link" onclick="goUrl('${ctx}/fm/dowload')">下载歌单</button>
     </div>
     <div class="pannel">
         <div>
@@ -90,8 +91,8 @@
         }
     });
 
-    function rs() {
-        location.href = '${ctx}/clear';
+    function goUrl(url) {
+        location.href = url;
     }
 
     function play() {
