@@ -78,7 +78,7 @@
                 </#if>
             </div>
             <input class="urls" type="hidden" value="${song.url}">
-            <input class="repeat" type="hidden" value="${song.repeat!0}">
+            <input class="repeat" type="hidden" value="${song.repeat!0}" index="${song?index}">
             <input class="pic" type="hidden" value="${ctx}/fm/img?p=${song.picture}">
         </div>
     </div>
@@ -145,7 +145,20 @@
             return;
         }
         if(order > 0) {
-            indexPlay(Math.floor(Math.random()*len));
+            // 高频歌曲，随机时多N次被选中机会
+            // 歌曲出现的概率为R, 红心歌曲数量L, 高频歌曲数量X
+            // 放大倍数N = (1/1-R)(RL/x-R)
+            var R = 1/5;
+            var L = len;
+            var X = $(".repeat[value='1']").length;
+            var N = Math.round((1/(1-R))*(R*L/X-R));
+            var rand = Math.floor(Math.random()*(len+X*N));
+            alert(rand);
+            if(rand > L-1 && N > 0) {
+                t = (rand - L) % X;
+                var rand = $($(".repeat[value='1']")[t]).attr("index");
+            }
+            indexPlay(rand);
         } else {
             indexPlay(curIndex+1);
         }

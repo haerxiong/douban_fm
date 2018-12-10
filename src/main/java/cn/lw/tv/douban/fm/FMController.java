@@ -1,5 +1,6 @@
 package cn.lw.tv.douban.fm;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -75,6 +76,13 @@ public class FMController {
         String repeat = request.getParameter("repeat");
         fmService.changeRepeat(un, sid, "1".equals(repeat) ? true : false);
         return "{\"success\":\"ok\"}";
+    }
+
+    @RequestMapping("/fm/random")
+    @ResponseBody
+    public String random(HttpServletRequest request, @CookieValue(name="un") String un) {
+        List<String> repeatSid = fmService.getRepeatSid(un);
+        return JSON.toJSON(repeatSid).toString();
     }
 
     @RequestMapping("/fm/img")

@@ -14,6 +14,15 @@ import java.util.Set;
 @Component
 public class FMService {
 
+    /**redis数据结构：
+     *      douban:red_songs:[用户名] 目录下储存红心歌曲，数据类型为key-string
+            douban:red_songs:[用户名]:[sid] 储存歌曲信息
+            douban:repeat:[用户名] 储存更喜欢的歌曲sid，数据类型为key-list
+     *
+     * @return
+     * @author VictorLiu 
+     * @date 2018/12/10 14:29 
+     */
     @Autowired
     private StringRedisTemplate rt;
 
@@ -46,6 +55,15 @@ public class FMService {
         List<Song> songs_hot = list[1];
         songs_hot.addAll(songs);
         return songs_hot;
+    }
+
+
+    /* 获取喜好度更高的歌曲sid
+    **/
+    public List<String> getRepeatSid(String userName) {
+        // 获取高频歌曲sid
+        List<String> repeat = rt.opsForList().range("douban:repeat:"+userName, 0, 1000);
+        return repeat;
     }
 
     /*
