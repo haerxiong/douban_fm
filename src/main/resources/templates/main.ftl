@@ -153,7 +153,6 @@
             var X = $(".repeat[value='1']").length;
             var N = Math.round((1/(1-R))*(R*L/X-R));
             var rand = Math.floor(Math.random()*(len+X*N));
-            alert(rand);
             if(rand > L-1 && N > 0) {
                 t = (rand - L) % X;
                 var rand = $($(".repeat[value='1']")[t]).attr("index");
