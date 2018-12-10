@@ -48,12 +48,24 @@
         <div id="title">---</div>
         <div id="singer">---</div>
         <div>
+            喜爱度：
+            <label class="radio-inline">
+                <input type="radio" value="0" name="repeat" ${(songs[0].repeat=="0")?string("checked", "")}>普通
+            </label>
+            <label class="radio-inline">
+                <input type="radio" value="1" name="repeat" ${(songs[0].repeat=="1")?string("checked", "")}>大概率随机
+            </label>
+            <label class="radio-inline">
+                <input id="more" type="checkbox" onclick="repeat=(this.checked)?1:0;">多放一次
+            </label>
+        </div>
+        <div>
             <img id="show" src="${ctx}/fm/img?p=${songs[0].picture}">
         </div>
     </div>
 <#list songs as song>
     <div class="col-sm-4 col-md-4">
-        <div class="thumbnail item" id="${song.sid}" onclick="autoPlay('${song.sid}')">
+        <div class="thumbnail item" id="${song.sid}" onclick="curIndex=${song?index};autoPlay('${song.sid}')">
             <div>
                 <#--<img src="${ctx}/fm/img?p=${song.picture}" alt="" onclick="autoPlay('${song.sid}')" class="pic">-->
             </div>
@@ -66,6 +78,7 @@
                 </#if>
             </div>
             <input class="urls" type="hidden" value="${song.url}">
+            <input class="repeat" type="hidden" value="${song.repeat!0}">
             <input class="pic" type="hidden" value="${ctx}/fm/img?p=${song.picture}">
         </div>
     </div>
@@ -77,9 +90,9 @@
 
 <script>
     var curIndex = 0;
-    var playing = false;
     var order = 1;
     var len = ${songs?size};
+    var repeat = 0;
 
     $(function () {
         var audio = document.getElementById('myaudio');
@@ -91,14 +104,29 @@
         }
     });
 
+    $('[type="radio"]').change(function(e){
+        var val = e.target.value;
+        var id = $(".item")[curIndex].id;
+        $.ajax({
+            type: 'POST',
+            url: "${ctx}/fm/repeat/"+id,
+            data: {repeat:val},
+            dataType: "json",
+            success: function(e) {
+                $("#" + id + " .repeat").val(val);
+            }
+        });
+    });
+
     function goUrl(url) {
         location.href = url;
     }
 
     function play() {
-        if(playing == true) {
+        if($("#myaudio")[0].paused) {
+            $("#myaudio")[0].play();
+        } else if($("#myaudio")[0].played) {
             $("#myaudio")[0].pause();
-            playing = false;
         } else {
             indexPlay(0);
         }
@@ -110,6 +138,12 @@
     }
 
     function next() {
+        if(repeat == 1) {
+            indexPlay(curIndex);
+            repeat = 0;
+            $("#more").prop("checked", false);
+            return;
+        }
         if(order > 0) {
             indexPlay(Math.floor(Math.random()*len));
         } else {
@@ -130,7 +164,6 @@
             index = len + index;
         if(index > len-1)
             index = index % len;
-        playing = true;
         var id = $(".item")[index].id;
         curIndex = index;
         autoPlay(id);
@@ -142,6 +175,9 @@
         $("#title").html($("#" + id + " .title").html());
         $("#singer").html($("#" + id + " .singer").html());
         $("#myaudio")[0].play();
+        var rp = $("#" + id + " .repeat").val() + "";
+        $(":radio[name='repeat']").prop("checked", false);
+        $(":radio[name='repeat'][value='" + rp + "']").prop("checked", true);
     }
 </script>
 

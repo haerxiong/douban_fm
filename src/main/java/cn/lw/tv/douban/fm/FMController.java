@@ -9,9 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
@@ -19,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 
 @Controller
@@ -60,7 +59,6 @@ public class FMController {
     @RequestMapping("/fm/main")
     public String main(Model model, @CookieValue(name="un",defaultValue="") String un, HttpServletResponse response) {
         List<Song> songs = fmService.getCache(un);
-//        List<Song> sub = songs.subList(0, 9);
         List<Song> sub = songs;
         model.addAttribute("songs", sub);
         return "main";
@@ -69,6 +67,14 @@ public class FMController {
     @RequestMapping("/fm/refresh")
     public String refresh() {
         return "index";
+    }
+
+    @RequestMapping("/fm/repeat/{sid}")
+    @ResponseBody
+    public String repeat(HttpServletRequest request, @PathVariable("sid") String sid, @CookieValue(name="un") String un) {
+        String repeat = request.getParameter("repeat");
+        fmService.changeRepeat(un, sid, "1".equals(repeat) ? true : false);
+        return "{\"success\":\"ok\"}";
     }
 
     @RequestMapping("/fm/img")

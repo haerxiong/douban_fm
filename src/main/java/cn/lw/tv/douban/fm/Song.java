@@ -14,6 +14,16 @@ public class Song {
     private String picture;
     private String url;
     private List<Singer> singers;
+    // 0普通，1特别喜欢
+    private String repeat;
+
+    public String getRepeat() {
+        return repeat;
+    }
+
+    public void setRepeat(String repeat) {
+        this.repeat = repeat;
+    }
 
     public String getTitle() {
         return title;
